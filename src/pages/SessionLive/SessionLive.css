@@ -1,0 +1,172 @@
+/* Container principale */
+.sessionlive-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: var(--gray-light);
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Titoli */
+.sessionlive-title, .sessionlive-subtitle {
+  text-align: center;
+  color: var(--text-dark);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Messaggio / alert */
+.sessionlive-message {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Messaggio di errore */
+.sessionlive-message.error {
+ background-color: var(--alert-bg);
+  border: 1px solid var(--alert-text);
+  color: var(--alert-text);
+}
+
+/* Messaggio di successo */
+.sessionlive-message.success {
+ background-color: var(--green-light);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+
+/* Sezioni principali */
+.sessionlive-section {
+  margin-bottom: 30px;
+}
+
+/* Tabelle */
+.sessionlive-table-wrapper {
+  overflow-x: auto;
+}
+
+.sessionlive-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.sessionlive-table th, .sessionlive-table td {
+  padding: 10px 12px;
+  border: 1px solid var(--gray-border);
+  text-align: left;
+}
+
+.sessionlive-table thead {
+  background-color: var(--brown-nature);
+  color: var(--text-light);
+}
+
+.sessionlive-table tbody tr {
+  background-color: var(--brown-light);
+  transition: background-color 0.2s ease;
+}
+
+.sessionlive-table tbody tr:hover {
+  background-color: var(--brown-sand);
+}
+
+/* Azioni / bottoni */
+.sessionlive-actions, .sessionlive-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Card e form */
+.sessionlive-card {
+  padding: 20px;
+  border-radius: 12px;
+  background-color: var(--brown-sand);
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sessionlive-card h3,
+.sessionlive-card h4 {
+  text-align: center;
+  color: var(--text-dark);
+  font-weight: 700;
+}
+
+.sessionlive-form-group {
+  margin-bottom: 15px;
+}
+
+.flex {
+  display: flex;
+}
+
+.sessionlive-players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.sessionlive-player-name {
+  min-width: 120px;
+  font-weight: 600;
+}
+
+.sessionlive-select {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--gray-border);
+}
+
+/* Bottoni personalizzati */
+.sessionlive-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Bottoni con palette globale */
+.sessionlive-btn.primary {
+  background-color: var(--mustard);
+  color: var(--text-light);
+}
+
+.sessionlive-btn.primary:hover {
+  background-color: var(--brown-nature);
+}
+
+.sessionlive-btn.success {
+  background-color: var(--green);
+  color: var(--text-light);
+}
+
+.sessionlive-btn.success:hover {
+  background-color: #1f7f4b;
+}
+
+.sessionlive-btn.danger {
+  background-color: var(--red-dark);
+  color: var(--text-light);
+}
+
+.sessionlive-btn.danger:hover {
+  background-color: var(--red-light);
+}
+
+.sessionlive-btn.secondary {
+  background-color: var(--brown-light);
+  color: var(--text-light);
+}
+
+.sessionlive-btn.secondary:hover {
+  background-color: var(--brown-sand);
+}

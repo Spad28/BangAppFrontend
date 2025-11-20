@@ -1,0 +1,58 @@
+:root {
+  /* Marroni */
+  --brown-light: #d2b48c;       /* Marrone chiaro / beige */
+  --brown-sand: #c19a6b;        /* Marrone sabbia medio chiaro */
+  --brown-nature: #a67c52;      /* Marrone naturale */
+  --brown-dark-earth: #8b5e3c;  /* Marrone scuro / terra */
+  --brown-dark: #6b3f26;        /* Marrone molto scuro / cioccolato fondente */
+
+  /* Colori caldi */
+  --mustard: #e1b000;       /* senape acceso */
+  --yellow: #f1c40f;        /* giallo brillante */
+  --orange: #d35400;        /* arancione caldo */
+
+  /* Rossi */
+  --red-light: #e74c3c;     /* rosso acceso */
+  --red-dark: #c0392b;      /* rosso scuro */
+
+  /* Verde */
+  --green-light: #d4efdf;
+  --green: #27ae60;         /* verde per successi o conferme */
+
+
+  /* Grigi e neutri */
+  --gray-light: #f8f4ec;    /* background generale */
+  --gray-lighter: #fffafa;  /* card / input sfondo */
+  --gray-border: #ddd;       /* bordi */
+  --gray-text: #666;         /* testo secondario */
+
+  /* Testo */
+  --text-dark: #4a3a2a;
+  --text-light: #ffffff;
+
+  /* Extra hover / alert */
+  --alert-bg: #ffdddd;
+  --alert-border: #ff6b6b;
+  --alert-text: #b30000;
+}
+
+
+/* Layout app */
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background-color: var(--gray-light);
+  color: var(--text-dark);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+  }

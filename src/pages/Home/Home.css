@@ -1,0 +1,123 @@
+/* ==========================
+   Container principale della Home
+========================== */
+.home-root {
+  padding: 40px 20px;
+  text-align: center;
+  min-height: 80vh; /* lascia spazio al footer */
+}
+
+/* ==========================
+   Hero section
+========================== */
+.hero.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.hero-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.hero-top .logo {
+  width: 160px;
+  height: auto;
+}
+
+/* ==========================
+   Card con testo e pulsanti
+========================== */
+.hero-card {
+  max-width: 600px;
+}
+
+.hero-card .lead {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--text-dark);
+}
+
+.hero-card .muted {
+  display: block;
+  margin-top: 10px;
+  color: var(--brown-nature); /* testo secondario */
+  font-size: 0.9rem;
+}
+
+/* ==========================
+   Pulsanti azioni
+========================== */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 30px;
+  justify-content: center;
+}
+
+.actions .btn {
+  padding: 12px 24px;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+/* ==========================
+   Bottoni con colori unici e coerenti
+========================== */
+.btn-newSession {
+  background-color: var(--brown-light);
+}
+
+.btn-newSession:hover {
+  background-color: var(--brown-dark);
+}
+
+.btn-loadSession {
+  background-color: var(--brown-sand);
+}
+
+.btn-loadSession:hover {
+  background-color: var(--brown-dark);
+}
+
+.btn-score {
+  background-color: var(--brown-nature);
+}
+
+.btn-score:hover {
+  background-color: var(--brown-dark);
+}
+
+.btn-rules {
+  background-color: var(--brown-dark-earth);
+}
+
+.btn-rules:hover {
+  background-color: var(--brown-dark);
+}
+
+.btn-settings {
+  background-color: var(--brown-dark);
+}
+
+.btn-settings:hover {
+  background-color: var(--brown-dark);
+}
+
+/* ==========================
+   Responsive
+========================== */
+@media (min-width: 768px) {
+  .actions {
+    flex-direction: row;
+  }
+}

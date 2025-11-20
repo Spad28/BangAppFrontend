@@ -1,0 +1,66 @@
+/* Container principale */
+.score-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: var(--gray-light); /* background chiaro dalla palette */
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+/* Titolo */
+.score-title {
+  text-align: center;
+  color: var(--text-dark);
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* Messaggio errore */
+.score-error {
+  background-color: var(--alert-bg);
+  border: 1px solid var(--red-dark);
+  color: var(--alert-text);
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Wrapper tabella per scroll verticale */
+.score-table-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 10px;
+}
+
+/* Tabella */
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Header tabella */
+.score-table thead {
+  background-color: var(--brown-nature);
+  color: var(--text-light);
+}
+
+.score-table th,
+.score-table td {
+  padding: 12px 15px;
+  text-align: center;
+  border: 1px solid var(--gray-border); /* contorno scuro */
+}
+
+/* Righe tabella */
+.score-table tbody tr {
+  background-color: var(--brown-light);
+  transition: background-color 0.2s ease;
+}
+
+.score-table tbody tr:hover {
+  background-color: var(--brown-sand);
+}

@@ -1,0 +1,18 @@
+.top-navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: var(--brown-dark);
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+
+  .top-navbar .brand {
+    color: var(--text-light);
+    text-decoration: none;
+  }
+
+  .top-navbar .brand:hover {
+    color: var(--text-light);
+  }

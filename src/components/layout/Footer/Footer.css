@@ -1,0 +1,8 @@
+.footer {
+  text-align: center;
+  padding: 15px 0;
+  background-color: var(--brown-dark);
+  color: var(--text-light);
+  font-weight: 600;
+  flex-shrink: 0; /* assicura che resti in fondo se la pagina è corta */
+}
