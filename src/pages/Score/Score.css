@@ -17,6 +17,15 @@
   font-weight: 700;
 }
 
+/* Match number */
+.match-number {
+  text-align: right;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
 /* Messaggio errore */
 .score-error {
   background-color: var(--alert-bg);

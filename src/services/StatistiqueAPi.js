@@ -10,4 +10,4 @@ const api = axios.create({
 });
 
 // Funzioni helper
-export const getPlayerClassification = () => api.get("/getPlayersClassificationOfGame");
+export const getClassification = () => api.get("/getClassification");

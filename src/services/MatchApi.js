@@ -11,3 +11,5 @@ const api = axios.create({
 
 // Funzioni helper
 export const addMatch = (matchData) => api.post("/addMatch", JSON.stringify(matchData));
+
+export const getMatchNumber = () => api.get("/getMatchNumber");
