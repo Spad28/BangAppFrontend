@@ -27,8 +27,8 @@ export default function SessionLive() {
   }, []);
 
   useEffect(() => {
-    if (showForm) {
-      setWinner(null);
+    if (!showForm) {
+      setWinner("");
       setWinnerRole("");
       setPlayersRoles([]);
     }
@@ -180,6 +180,7 @@ export default function SessionLive() {
           <div className="sessionlive-form-group">
             <label><strong>Vincitore:</strong></label>
             <div className="sessionlive-players">
+
               {selectedPlayers.map(player => (
                 <button
                   key={player}
@@ -194,8 +195,21 @@ export default function SessionLive() {
                   {player}
                 </button>
               ))}
+              {selectedPlayers.length !== 4 && (
+                <button
+                  type="button"
+                  className={`sessionlive-btn ${winner === "forfait" ? "success" : "outline"}`}
+                  onClick={() => {
+                    setWinner("forfait");
+                    setWinnerRole("forfait");
+                  }}
+                >
+                  Forfait
+                </button>
+              )}
             </div>
           </div>
+
 
           <h4>Associa ruoli ai giocatori</h4>
           {selectedPlayers.map(player => (

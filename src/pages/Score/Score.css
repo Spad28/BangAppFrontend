@@ -57,11 +57,20 @@
   color: var(--text-light);
 }
 
+/* Header fisso */
+.score-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: var(--brown-nature); /* mantiene lo stesso colore */
+  z-index: 2; /* sopra le altre righe */
+}
+
+/* Celle tabella */
 .score-table th,
 .score-table td {
   padding: 12px 15px;
   text-align: center;
-  border: 1px solid var(--gray-border); /* contorno scuro */
+  border: 1px solid var(--gray-border);
 }
 
 /* Righe tabella */
