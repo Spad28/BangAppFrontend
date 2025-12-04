@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPlayers, addPlayer } from "../../services/PlayerApi.js";
+import { getAllPlayers, addNewPlayer } from "../../services/PlayerApi.js";
 import { createSession } from "../../services/SessionApi.js";
 import "./StartSession.css";
 
@@ -13,11 +13,14 @@ export default function Session() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getPlayers()
+    getAllPlayers()
       .then(res => setPlayers(res.data.data))
       .catch(err => {
-        console.error(err);
-        setMessage("Errore nel caricamento dei giocatori");
+        if (err.response && err.response.data) {
+          setMessage(err.response.data.message);
+        } else {
+          setMessage("Errore nel caricamento dei giocatori");
+        }
         setMessageType("error");
       });
   }, []);
@@ -25,7 +28,7 @@ export default function Session() {
   const handleAddNewPlayer = () => {
     if (!newPlayer.trim()) return;
 
-    addPlayer(newPlayer)
+    addNewPlayer(newPlayer)
       .then(res => {
         const response = res.data;
         setMessage(response.message);
@@ -86,7 +89,11 @@ export default function Session() {
     <div className="session-container">
       <h2 className="session-title">Nuova Sessione</h2>
 
-      {message && <div className={`session-message ${messageType}`}>{message}</div>}
+      {message &&
+        <div className={`session-message ${messageType}`}>
+          {message}
+        </div>
+      }
 
       {/* Giocatori esistenti */}
       <div className="session-section">

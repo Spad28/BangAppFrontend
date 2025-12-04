@@ -1,16 +1,19 @@
-import {useState, useEffect} from "react";
-import {useParams, useNavigate} from "react-router-dom";
-import {getSessionInfoFromId, getSumSessionScore, endSession} from "../../services/SessionApi.js";
-import {addMatch} from "../../services/MatchApi.js";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { getSessionInfoFromId, getCumulativeSessionScore, endSession } from "../../services/SessionApi.js";
+import { addNewMatch } from "../../services/MatchApi.js";
 import "./SessionLive.css";
 
 export default function SessionLive() {
-  const {sessionId} = useParams();
+  const { sessionId } = useParams();
   const navigate = useNavigate();
 
   const [session, setSession] = useState(null);
   const [message, setMessage] = useState(null);
-  const [messageType, setMessageType] = useState("success"); // <--- stato per tipo messaggio
+  const [messageType, setMessageType] = useState("success");
+  const [messageUpdateId, setMessageUpdateId] = useState(0);
+  const messageRef = useRef(null);
+  const formRef = useRef(null);
   const [ranking, setRanking] = useState({});
   const [showForm, setShowForm] = useState(false);
 
@@ -21,11 +24,51 @@ export default function SessionLive() {
   const roles = ["Sceriffo", "Vice", "Fuorilegge", "Rinnegato"];
   const selectedPlayers = JSON.parse(sessionStorage.getItem("selectedPlayers") || "[]");
 
+  /**
+   * Funzione helper per mostrare messaggi
+   * Scroll e focus automatico se errore
+   */
+  const showMessage = useCallback((msg, type = "success") => {
+    setMessage(msg);
+    setMessageType(type);
+    setMessageUpdateId(prev => prev + 1);
+  }, []);
+
+  /** Fetch iniziale della sessione */
+  const fetchSession = useCallback(() => {
+    getSessionInfoFromId(sessionId)
+      .then(res => setSession(res.data.data))
+      .catch(err => {
+        if (err.response && err.response.data) {
+          showMessage(err.response.data.message, "error");
+        } else {
+          showMessage("Errore nel caricamento della sessione", "error");
+        }
+      });
+  }, [sessionId, showMessage]);
+
+  /** Fetch iniziale della classifica */
+  const fetchRanking = useCallback(() => {
+    getCumulativeSessionScore(sessionId)
+      .then(res => {
+        if (res.data.success) setRanking(res.data.data);
+      })
+      .catch(err => {
+        if (err.response && err.response.data) {
+          showMessage(err.response.data.message, "error");
+        } else {
+          showMessage("Errore nel caricamento della classifica", "error");
+        }
+      });
+  }, [sessionId, showMessage]);
+
+  /** Fetch iniziale all'apertura del componente */
   useEffect(() => {
     fetchSession();
     fetchRanking();
-  }, []);
+  }, [fetchRanking, fetchSession]);
 
+  /** Reset form quando chiuso */
   useEffect(() => {
     if (!showForm) {
       setWinner("");
@@ -34,85 +77,82 @@ export default function SessionLive() {
     }
   }, [showForm]);
 
-  const fetchSession = () => {
-    getSessionInfoFromId(sessionId)
-      .then(res => setSession(res.data.data))
-      .catch(() => {
-        setMessage("Errore nel caricamento della sessione");
-        setMessageType("error");
-      });
-  };
+  /** Click fuori dal form cancella messaggio */
+  useEffect(() => {
+    const handleClick = (event) => {
+      if (message && formRef.current && !formRef.current.contains(event.target)) {
+        setMessage(null);
+      }
+    };
 
-  const fetchRanking = () => {
-    getSumSessionScore(sessionId)
-      .then(res => {
-        if (res.data.success) setRanking(res.data.data);
-      })
-      .catch(() => {
-        setMessage("Errore nel caricamento della classifica");
-        setMessageType("error");
-      });
-  };
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [message]);
 
+  useEffect(() => {
+    if (message && messageType === "error" && messageRef.current) {
+      messageRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      messageRef.current.focus({ preventScroll: true });
+    }
+  }, [message, messageType, messageUpdateId]);
+
+  /** Fine sessione */
   const handleEndSession = () => {
     if (!ranking || Object.keys(ranking).length === 0) {
-      setMessage("Impossibile terminare la sessione: classifica vuota");
-      setMessageType("error");
+      showMessage("Impossibile terminare la sessione: classifica vuota", "error");
       return;
     }
 
     const sessionEndTime = new Date().toISOString();
-
-    const entries = Object.entries(ranking); // [ [name, score], ... ]
+    const entries = Object.entries(ranking);
     const maxScore = Math.max(...entries.map(entry => entry[1]));
 
     const sessionWinners = entries
       .filter(entry => entry[1] === maxScore)
-      .map(entry => entry[0]); // prendi il nome
-
+      .map(entry => entry[0]);
 
     endSession(sessionId, sessionWinners, sessionEndTime)
       .then(() => {
-        setMessage(`Sessione terminata. Vincitore: ${sessionWinners}`);
-        setMessageType("success");
+        showMessage(`Sessione terminata. Vincitore: ${sessionWinners}`, "success");
         setTimeout(() => navigate("/"), 1500);
       })
-      .catch(() => {
-        setMessage("Errore nel terminare la sessione");
-        setMessageType("error");
+      .catch(err => {
+        if (err.response && err.response.data) {
+          showMessage(err.response.data.message, "error");
+        } else {
+          showMessage("Errore nel terminare la sessione", "error");
+        }
       });
   };
 
+  /** Cambio ruolo giocatore */
   const handleRoleChange = (player, role) => {
-    setPlayersRoles(prev => [...prev.filter(pr => pr.player !== player), {player, role}]);
+    setPlayersRoles(prev => [...prev.filter(pr => pr.player !== player), { player, role }]);
     if (player === winner) setWinnerRole(role);
   };
 
+  /** Salva match */
   const handleSaveMatch = () => {
     if (!winner || !winnerRole) {
-      setMessage("Seleziona vincitore e ruolo vincitore");
-      setMessageType("error");
+      showMessage("Seleziona vincitore e ruolo vincitore", "error");
       return;
     }
 
-    const matchData = {
-      sessionId: Number(sessionId),
-      winner,
-      winnerRole,
-      playersRoles
-    };
+    const matchData = { sessionId: Number(sessionId), winner, winnerRole, playersRoles };
 
-    addMatch(matchData)
+    addNewMatch(matchData)
       .then(res => {
-        setMessage(res.data.message);
-        setMessageType("success");
+        showMessage(res.data.message, "success");
         setShowForm(false);
         fetchSession();
         fetchRanking();
       })
-      .catch(() => {
-        setMessage("Errore nell'aggiungere il match");
-        setMessageType("error");
+      .catch(err => {
+        if (err.response && err.response.data) {
+          showMessage(err.response.data.message, "error");
+        } else {
+          showMessage("Errore di rete o server non raggiungibile", "error");
+        }
       });
   };
 
@@ -122,7 +162,16 @@ export default function SessionLive() {
     <div className="sessionlive-container">
       <h2 className="sessionlive-title">Sessione Live</h2>
 
-      {message && <div className={`sessionlive-message ${messageType}`}>{message}</div>}
+      {message &&
+        <div
+          ref={messageRef}
+          tabIndex={-1}
+          className={`sessionlive-message ${messageType}`}
+          aria-live={messageType === "error" ? "assertive" : "polite"}
+        >
+          {message}
+        </div>
+      }
 
       <p className="sessionlive-subtitle"><strong>Session ID:</strong> {sessionId}</p>
 
@@ -131,26 +180,26 @@ export default function SessionLive() {
         <div className="sessionlive-table-wrapper">
           <table className="sessionlive-table">
             <thead>
-            <tr>
-              <th>ID Match</th>
-              <th>Vincitore</th>
-              <th>Ruolo Vincitore</th>
-            </tr>
+              <tr>
+                <th>ID Match</th>
+                <th>Vincitore</th>
+                <th>Ruolo Vincitore</th>
+              </tr>
             </thead>
             <tbody>
-            {session.matchList?.length ? (
-              session.matchList.map(match => (
-                <tr key={match.matchId}>
-                  <td>{match.matchId}</td>
-                  <td>{match.winner}</td>
-                  <td>{match.winnerRole}</td>
+              {session.matchList?.length ? (
+                session.matchList.map(match => (
+                  <tr key={match.matchId}>
+                    <td>{match.matchId}</td>
+                    <td>{match.winner}</td>
+                    <td>{match.winnerRole}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3">Nessun match presente</td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3">Nessun match presente</td>
-              </tr>
-            )}
+              )}
             </tbody>
           </table>
         </div>
@@ -158,7 +207,7 @@ export default function SessionLive() {
 
       <div className="sessionlive-actions">
         {session.sessionEndTime ? (
-          <button className="sessionlive-btn secondary" onClick={() => navigate("/")}>
+          <button className="sessionlive-btn secondary" onClick={() => navigate("/goToSession")}>
             Torna Indietro
           </button>
         ) : (
@@ -174,13 +223,12 @@ export default function SessionLive() {
       </div>
 
       {showForm && (
-        <div className="sessionlive-card">
+        <div ref={formRef} className="sessionlive-card" onClick={() => setMessage(null)}>
           <h3>Aggiungi Match</h3>
 
           <div className="sessionlive-form-group">
             <label><strong>Vincitore:</strong></label>
             <div className="sessionlive-players">
-
               {selectedPlayers.map(player => (
                 <button
                   key={player}
@@ -210,7 +258,6 @@ export default function SessionLive() {
             </div>
           </div>
 
-
           <h4>Associa ruoli ai giocatori</h4>
           {selectedPlayers.map(player => (
             <div key={player} className="sessionlive-form-group flex">
@@ -238,18 +285,18 @@ export default function SessionLive() {
         {ranking && Object.keys(ranking).length > 0 ? (
           <table className="sessionlive-table">
             <thead>
-            <tr>
-              <th>Giocatore</th>
-              <th>Punteggio</th>
-            </tr>
+              <tr>
+                <th>Giocatore</th>
+                <th>Punteggio</th>
+              </tr>
             </thead>
             <tbody>
-            {Object.entries(ranking).sort((a, b) => b[1] - a[1]).map(([player, score]) => (
-              <tr key={player}>
-                <td>{player}</td>
-                <td>{score}</td>
-              </tr>
-            ))}
+              {Object.entries(ranking).sort((a, b) => b[1] - a[1]).map(([player, score]) => (
+                <tr key={player}>
+                  <td>{player}</td>
+                  <td>{score}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         ) : (<p>Nessuna classifica disponibile</p>)}

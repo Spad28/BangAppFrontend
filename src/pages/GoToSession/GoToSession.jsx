@@ -16,8 +16,12 @@ export default function GoToSession() {
         setSessions(res.data.data || []);
         setErrorMessage(null);
       })
-      .catch(() => {
-        setErrorMessage("Errore nel caricamento delle sessioni: server non raggiungibile");
+      .catch(err => {
+        if (err.response && err.response.data) {
+          setErrorMessage(err.response.data.message);
+        } else {
+          setErrorMessage("Errore nel caricamento delle sessioni: server non raggiungibile");
+        }
       });
   }, []);
 

@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 import {getClassification} from "../../services/StatistiqueAPi.js";
-import {getMatchNumber} from "../../services/MatchApi.js";
+import {getMatchesNumber} from "../../services/MatchApi.js";
 import "./Score.css";
 
 export default function Score() {
@@ -10,7 +10,7 @@ export default function Score() {
 
 
   useEffect(() => {
-  Promise.all([getClassification(), getMatchNumber()])
+  Promise.all([getClassification(), getMatchesNumber()])
     .then(([classificationRes, matchNumberRes]) => {
       // --- Gestione della classifica ---
       const data = classificationRes.data.data || {};
@@ -40,8 +40,11 @@ export default function Score() {
       setErrorMessage(null);
     })
     .catch((err) => {
-      console.error(err);
-      setErrorMessage("Errore nel caricamento della classifica o del numero di match");
+      if (err.response && err.response.data) {
+        setErrorMessage(err.response.data.message);
+      } else {
+        setErrorMessage("Errore nel caricamento della classifica o del numero di match");
+      }
     });
 }, []);
 
@@ -54,6 +57,8 @@ export default function Score() {
       {errorMessage && (
         <div className="score-error">{errorMessage}</div>
       )}
+
+
 
       <div className="score-table-wrapper">
         <table className="score-table">

@@ -3,15 +3,15 @@ import { BASE_API_URL } from "../config.js";
 
 // Crea istanza axios per Match
 const api = axios.create({
-  baseURL: `${BASE_API_URL}/session`, // usa la variabile globale
+  baseURL: `${BASE_API_URL}/sessions`, // usa la variabile globale
   headers: {
     "Content-Type": "application/json"
   }
 });
 
 // Funzioni helper
-export const createSession = (sessionStartTime, nPlayer) => api.post("/start", {sessionStartTime, nPlayer});
-export const getSessionInfoFromId = (id) =>  api.get(`/getSessionInfo/${id}`);
-export const getSumSessionScore = (id) => api.get(`/getSumSessionScore/${id}`);
-export const endSession = (sessionId,sessionWinners,sessionEndTime) => api.post("/endSession", { sessionId, sessionWinners, sessionEndTime });
-export const getAllSession = () => api.get("/getAllSession");
+export const createSession = (sessionStartTime, nPlayer) => api.post("", {sessionStartTime, nPlayer});
+export const getSessionInfoFromId = (id) =>  api.get(`/${id}`);
+export const getCumulativeSessionScore = (id) => api.get(`/${id}/scores/sum`);
+export const endSession = (sessionId,sessionWinners,sessionEndTime) => api.post(`/${sessionId}/end`, { sessionWinners, sessionEndTime });
+export const getAllSession = () => api.get("");
