@@ -54,7 +54,7 @@ export default function Session() {
     const sessionStartTime = new Date().toISOString();
     const nPlayer = Number(selectedPlayers.length);
 
-    createSession(sessionStartTime, nPlayer)
+    createSession(sessionStartTime, nPlayer, selectedPlayers)
       .then(res => {
         const response = res.data;
         setMessage(response.message);

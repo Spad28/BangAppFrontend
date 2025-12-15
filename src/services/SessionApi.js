@@ -10,8 +10,10 @@ const api = axios.create({
 });
 
 // Funzioni helper
-export const createSession = (sessionStartTime, nPlayer) => api.post("", {sessionStartTime, nPlayer});
+export const createSession = (sessionStartTime, nPlayer, playersList) => api.post("", {sessionStartTime, nPlayer, playersList});
 export const getSessionInfoFromId = (id) =>  api.get(`/${id}`);
 export const getCumulativeSessionScore = (id) => api.get(`/${id}/scores/sum`);
-export const endSession = (sessionId,sessionWinners,sessionEndTime) => api.post(`/${sessionId}/end`, { sessionWinners, sessionEndTime });
+export const endSession = (id,sessionWinners,sessionEndTime) => api.post(`/${id}/end`, { sessionWinners, sessionEndTime });
 export const getAllSession = () => api.get("");
+
+export const getPlayersList = (id) => api.get(`/${id}/playersList`);

@@ -1,11 +1,16 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { getSessionInfoFromId, getCumulativeSessionScore, endSession } from "../../services/SessionApi.js";
-import { addNewMatch } from "../../services/MatchApi.js";
+import {useState, useEffect, useRef, useCallback} from "react";
+import {useParams, useNavigate} from "react-router-dom";
+import {
+  getSessionInfoFromId,
+  getCumulativeSessionScore,
+  endSession,
+  getPlayersList
+} from "../../services/SessionApi.js";
+import {addNewMatch} from "../../services/MatchApi.js";
 import "./SessionLive.css";
 
 export default function SessionLive() {
-  const { sessionId } = useParams();
+  const {sessionId} = useParams();
   const navigate = useNavigate();
 
   const [session, setSession] = useState(null);
@@ -22,7 +27,8 @@ export default function SessionLive() {
   const [winnerRole, setWinnerRole] = useState("");
 
   const roles = ["Sceriffo", "Vice", "Fuorilegge", "Rinnegato"];
-  const selectedPlayers = JSON.parse(sessionStorage.getItem("selectedPlayers") || "[]");
+  const [selectedPlayers, setSelectedPlayers] = useState(() => JSON.parse(sessionStorage.getItem("selectedPlayers") || "[]"));
+
 
   /**
    * Funzione helper per mostrare messaggi
@@ -33,6 +39,22 @@ export default function SessionLive() {
     setMessageType(type);
     setMessageUpdateId(prev => prev + 1);
   }, []);
+
+  const fetchPlayers = useCallback(() => {
+    getPlayersList(sessionId)
+      .then(res => {
+        setSelectedPlayers(res.data.data);
+        sessionStorage.setItem("selectedPlayers", JSON.stringify(res.data.data));
+      })
+      .catch(err => {
+        if (err.response && err.response.data) {
+          showMessage(err.response.data.message, "error");
+        } else {
+          showMessage("Errore nel caricamento della lista dei giocatori", "error");
+        }
+      });
+  }, [sessionId, showMessage]);
+
 
   /** Fetch iniziale della sessione */
   const fetchSession = useCallback(() => {
@@ -62,11 +84,21 @@ export default function SessionLive() {
       });
   }, [sessionId, showMessage]);
 
-  /** Fetch iniziale all'apertura del componente */
+  /** Fetch iniziale */
   useEffect(() => {
     fetchSession();
     fetchRanking();
-  }, [fetchRanking, fetchSession]);
+  }, [fetchSession, fetchRanking]);
+
+  /** Quando la sessione è disponibile */
+  useEffect(() => {
+    if (!session) return;
+
+    if (session.sessionEndTime === null && selectedPlayers.length === 0) {
+      fetchPlayers();
+    }
+  }, [session, selectedPlayers.length, fetchPlayers]);
+
 
   /** Reset form quando chiuso */
   useEffect(() => {
@@ -91,8 +123,8 @@ export default function SessionLive() {
 
   useEffect(() => {
     if (message && messageType === "error" && messageRef.current) {
-      messageRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-      messageRef.current.focus({ preventScroll: true });
+      messageRef.current.scrollIntoView({behavior: "smooth", block: "center"});
+      messageRef.current.focus({preventScroll: true});
     }
   }, [message, messageType, messageUpdateId]);
 
@@ -127,7 +159,7 @@ export default function SessionLive() {
 
   /** Cambio ruolo giocatore */
   const handleRoleChange = (player, role) => {
-    setPlayersRoles(prev => [...prev.filter(pr => pr.player !== player), { player, role }]);
+    setPlayersRoles(prev => [...prev.filter(pr => pr.player !== player), {player, role}]);
     if (player === winner) setWinnerRole(role);
   };
 
@@ -138,7 +170,7 @@ export default function SessionLive() {
       return;
     }
 
-    const matchData = { sessionId: Number(sessionId), winner, winnerRole, playersRoles };
+    const matchData = {sessionId: Number(sessionId), winner, winnerRole, playersRoles};
 
     addNewMatch(matchData)
       .then(res => {
@@ -180,26 +212,26 @@ export default function SessionLive() {
         <div className="sessionlive-table-wrapper">
           <table className="sessionlive-table">
             <thead>
-              <tr>
-                <th>ID Match</th>
-                <th>Vincitore</th>
-                <th>Ruolo Vincitore</th>
-              </tr>
+            <tr>
+              <th>ID Match</th>
+              <th>Vincitore</th>
+              <th>Ruolo Vincitore</th>
+            </tr>
             </thead>
             <tbody>
-              {session.matchList?.length ? (
-                session.matchList.map(match => (
-                  <tr key={match.matchId}>
-                    <td>{match.matchId}</td>
-                    <td>{match.winner}</td>
-                    <td>{match.winnerRole}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3">Nessun match presente</td>
+            {session.matchList?.length ? (
+              session.matchList.map(match => (
+                <tr key={match.matchId}>
+                  <td>{match.matchId}</td>
+                  <td>{match.winner}</td>
+                  <td>{match.winnerRole}</td>
                 </tr>
-              )}
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3">Nessun match presente</td>
+              </tr>
+            )}
             </tbody>
           </table>
         </div>
@@ -285,18 +317,18 @@ export default function SessionLive() {
         {ranking && Object.keys(ranking).length > 0 ? (
           <table className="sessionlive-table">
             <thead>
-              <tr>
-                <th>Giocatore</th>
-                <th>Punteggio</th>
-              </tr>
+            <tr>
+              <th>Giocatore</th>
+              <th>Punteggio</th>
+            </tr>
             </thead>
             <tbody>
-              {Object.entries(ranking).sort((a, b) => b[1] - a[1]).map(([player, score]) => (
-                <tr key={player}>
-                  <td>{player}</td>
-                  <td>{score}</td>
-                </tr>
-              ))}
+            {Object.entries(ranking).sort((a, b) => b[1] - a[1]).map(([player, score]) => (
+              <tr key={player}>
+                <td>{player}</td>
+                <td>{score}</td>
+              </tr>
+            ))}
             </tbody>
           </table>
         ) : (<p>Nessuna classifica disponibile</p>)}
